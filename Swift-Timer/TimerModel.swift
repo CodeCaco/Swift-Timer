@@ -1,0 +1,39 @@
+import Foundation
+
+@MainActor
+class TimerModel: ObservableObject {
+    @Published var isRunning = false
+    @Published var count = 0
+    private var total = 0
+    
+    func SetTimer(min: Int) {
+        count = 60 * min
+        total = count
+        isRunning = false
+    }
+    
+    func RunCountdown() async {
+        guard isRunning else { return }
+        while isRunning {
+            try? await Task.sleep(for: .seconds(1))
+            guard isRunning else { break }
+            if count > 0 {
+                count -= 1
+            } else {
+                count = 0
+                isRunning = false
+            }
+        }
+    }
+    
+    var formattedTime: String {
+        let minutes = count / 60
+        let seconds = count % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+    
+    var progress: Double{
+        guard total > 0 else { return 0 }
+        return 1 - Double(total - count) / Double(total)
+    }
+}
