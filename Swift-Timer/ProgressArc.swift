@@ -10,12 +10,12 @@ struct ProgressArc: View {
         ZStack {
             Circle()
                 .trim(from: start, to: end)
-                .stroke(Color.blue.opacity(0.6), lineWidth: 10)
+                .stroke(Color.blue.opacity(0.4), lineWidth: 10)
                 .rotationEffect(.degrees(180))
             
             Circle()
                 .trim(from: start, to: progress * end)
-                .stroke(Color.primary, lineWidth: 10)
+                .stroke(Color.blue, lineWidth: 10)
                 .rotationEffect(.degrees(180))
         }
     }

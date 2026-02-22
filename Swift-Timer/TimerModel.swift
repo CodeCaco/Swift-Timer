@@ -6,13 +6,13 @@ class TimerModel: ObservableObject {
     @Published var count = 0
     private var total = 0
     
-    func SetTimer(min: Int) {
+    func setTimer(min: Int) {
         count = 60 * min
         total = count
         isRunning = false
     }
     
-    func RunCountdown() async {
+    func runCountdown() async {
         guard isRunning else { return }
         while isRunning {
             try? await Task.sleep(for: .seconds(1))
@@ -24,6 +24,12 @@ class TimerModel: ObservableObject {
                 isRunning = false
             }
         }
+    }
+    
+    func reset() {
+        isRunning = false
+        count = 0
+        total = 0
     }
     
     var formattedTime: String {

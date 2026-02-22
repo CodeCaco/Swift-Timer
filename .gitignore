@@ -4,6 +4,10 @@
 
 ## User settings
 xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+*.xcbkptlist
 
 ## Obj-C/Swift specific
 *.hmap
@@ -61,3 +65,4 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 .DS_Store
+Swift-Timer.xcodeproj/xcuserdata/vascoleitao.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
