@@ -21,6 +21,7 @@ class TimerModel: ObservableObject {
                 count -= 1
             } else {
                 count = 0
+                total = 0
                 isRunning = false
             }
         }
@@ -41,5 +42,12 @@ class TimerModel: ObservableObject {
     var progress: Double{
         guard total > 0 else { return 0 }
         return 1 - Double(total - count) / Double(total)
+    }
+    
+    func updateProgress(value: Double) {
+        guard total > 0 else { return }
+
+        let clamped = min(max(value, 0), 1)
+        count = Int((Double(total) * clamped).rounded())
     }
 }

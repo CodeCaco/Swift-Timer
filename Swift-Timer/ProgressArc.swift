@@ -6,6 +6,12 @@ struct ProgressArc: View {
     let start: CGFloat = 0
     let end: CGFloat = 0.5
     let lineWidth: CGFloat = 12
+    let onDragProgress: (CGFloat) -> Void
+
+    init(progress: CGFloat, onDragProgress: @escaping (CGFloat) -> Void = { _ in }) {
+        self.progress = progress
+        self.onDragProgress = onDragProgress
+    }
     
     var body: some View {
         GeometryReader { geo in
@@ -42,16 +48,30 @@ struct ProgressArc: View {
                             .stroke(Color.blue, lineWidth: 2)
                     }
                     .position(knobPosition(p: p, r: radius, c: center))
-                    
+                    .gesture(
+                        DragGesture(minimumDistance: 0, coordinateSpace: .named("arcSpace"))
+                            .onChanged {newLoc in
+                                onDragProgress(progressFromDrag(loc: newLoc.location, center: center))
+                            }
+                    )
             }
-
         }
+        .coordinateSpace(name: "arcSpace")
     }
     
     // Calculate position based on the progress with radius and center
     func knobPosition(p: CGFloat, r: CGFloat, c: CGPoint) -> CGPoint {
         let a = CGFloat.pi * (1 - p)
         return CGPoint(x: c.x + r*cos(a), y: c.y - r*sin(a))
+    }
+    
+    func progressFromDrag(loc: CGPoint, center: CGPoint) -> CGFloat{
+        let dx = loc.x - center.x
+        let dy = center.y - loc.y
+        let angle = atan2(dy, dx)
+        let clampedAngle = min(max(angle, 0), .pi)
+        let newProgress = 1 - (clampedAngle / .pi)
+       return newProgress
     }
 }
 

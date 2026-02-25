@@ -7,7 +7,12 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            ProgressArc(progress: CGFloat(timer.progress))
+            ProgressArc(progress: CGFloat(timer.progress)) { p in
+                timer.updateProgress(value: Double(p))
+                if !timer.isRunning && timer.count > 0 {
+                    showReset = true
+                }
+            }
             VStack {
                 Text("\(timer.formattedTime)")
                     .font(.system(size: 35))
@@ -23,25 +28,25 @@ struct ContentView: View {
                     .padding(5)
                 }
                 HStack {
-                    Button {
-                        if !timer.isRunning && timer.count > 0 {
-                            showReset = true
-                        }
-                        timer.isRunning.toggle()
-                    } label: {
-                        Image(systemName: timer.isRunning ? "pause" : "play")
-                            .font(.system(size: 30))
-                            .foregroundStyle(.tint)
-                            .animation(nil, value: timer.isRunning)
-                    }
-                    if showReset {
+                    if timer.count > 0 {
                         Button {
-                            timer.isRunning = false
-                            timer.count = 0
-                            showReset = false
+                            if !timer.isRunning && timer.count > 0 {
+                                showReset = true
+                            }
+                            timer.isRunning.toggle()
                         } label: {
-                            Image(systemName: "stop")
+                            Image(systemName: timer.isRunning ? "pause" : "play")
                                 .font(.system(size: 30))
+                                .foregroundStyle(.tint)
+                                .animation(nil, value: timer.isRunning)
+                        }
+                        if showReset {
+                            Button {
+                                timer.reset()
+                            } label: {
+                                Image(systemName: "stop")
+                                    .font(.system(size: 30))
+                            }
                         }
                     }
                 }
@@ -49,6 +54,11 @@ struct ContentView: View {
             .padding()
             .task(id: timer.isRunning) {
                 await timer.runCountdown()
+            }
+            .onChange(of: timer.count) { _, newValue in
+                if newValue == 0 {
+                    showReset = false
+                }
             }
         }
         .padding(50)
