@@ -2,6 +2,7 @@ import Foundation
 
 @MainActor
 class TimerModel: ObservableObject {
+    @Published var isActivated = false
     @Published var isRunning = false
     @Published var count = 0
     private var total = 0
@@ -10,12 +11,17 @@ class TimerModel: ObservableObject {
         count = 60 * min
         total = count
         isRunning = false
+        isActivated = false
     }
     
     func runCountdown() async {
         guard isRunning else { return }
         while isRunning {
-            try? await Task.sleep(for: .seconds(1))
+            do {
+                try await Task.sleep(for: .seconds(1))
+            } catch {
+                return
+            }
             guard isRunning else { break }
             if count > 0 {
                 count -= 1
@@ -23,7 +29,26 @@ class TimerModel: ObservableObject {
                 count = 0
                 total = 0
                 isRunning = false
+                isActivated = false
             }
+        }
+    }
+    
+    func start() {
+        guard count > 0 else { return }
+        isActivated = true
+        isRunning = true
+    }
+    
+    func pause() {
+        isRunning = false
+    }
+    
+    func toggleRunning() {
+        if isRunning {
+            pause()
+        } else {
+            start()
         }
     }
     
@@ -31,6 +56,7 @@ class TimerModel: ObservableObject {
         isRunning = false
         count = 0
         total = 0
+        isActivated = false
     }
     
     var formattedTime: String {
