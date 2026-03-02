@@ -11,10 +11,11 @@ struct ContentView: View {
             }
             VStack {
                 Text("\(timer.formattedTime)")
-                    .font(.system(size: 35))
-                    .font(.footnote)
+                    .font(.largeTitle.monospacedDigit())
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
+                    .accessibilityLabel("Remaining time")
+                    .accessibilityValue(timer.formattedTime)
                 HStack {
                     ForEach(preset, id: \.self) { min in
                         Button {
@@ -22,7 +23,8 @@ struct ContentView: View {
                         } label: {
                             Image(systemName: "\(min).square")
                         }
-                        .font(.system(size: 30))
+                        .font(.title2)
+                        .accessibilityLabel("Set timer to \(min) minutes")
                     }
                     .padding(5)
                 }
@@ -32,17 +34,19 @@ struct ContentView: View {
                             timer.toggleRunning()
                         } label: {
                             Image(systemName: timer.isRunning ? "pause" : "play")
-                                .font(.system(size: 30))
+                                .font(.title2)
                                 .foregroundStyle(.tint)
                                 .animation(nil, value: timer.isRunning)
                         }
+                        .accessibilityLabel(timer.isRunning ? "Pause timer" : "Start timer")
                         if timer.isActivated {
                             Button {
                                 timer.reset()
                             } label: {
                                 Image(systemName: "stop")
-                                    .font(.system(size: 30))
+                                    .font(.title2)
                             }
+                            .accessibilityLabel("Reset timer")
                         }
                     }
                 }

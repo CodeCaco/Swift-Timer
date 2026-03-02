@@ -69,7 +69,9 @@ struct ProgressArc: View {
         let dx = loc.x - center.x
         let dy = center.y - loc.y
         let angle = atan2(dy, dx)
-        let clampedAngle = min(max(angle, 0), .pi)
+        // Project lower-half touches onto the upper arc by mirroring angle.
+        let projectedAngle = angle < 0 ? abs(angle) : angle
+        let clampedAngle = min(max(projectedAngle, 0), .pi)
         let newProgress = 1 - (clampedAngle / .pi)
        return newProgress
     }
