@@ -4,8 +4,7 @@ import SwiftUI
 struct SwiftTimerApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppRootView()
         }
     }
 }
-

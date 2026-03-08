@@ -2,9 +2,9 @@ import XCTest
 @testable import Swift_Timer
 
 @MainActor
-final class TimerModelTests: XCTestCase {
+final class TimerViewModelTests: XCTestCase {
     func testSetTimerInitializesState() {
-        let model = TimerModel()
+        let model = TimerViewModel()
 
         model.setTimer(min: 1)
 
@@ -16,7 +16,7 @@ final class TimerModelTests: XCTestCase {
     }
 
     func testStartAndPauseUpdateRunningStateAndRemainingTime() async {
-        let model = TimerModel()
+        let model = TimerViewModel()
         model.setTimer(min: 1)
         model.start()
 
@@ -33,9 +33,9 @@ final class TimerModelTests: XCTestCase {
     }
 
     func testCountdownCompletionResetsState() async {
-        let model = TimerModel()
+        let model = TimerViewModel()
         model.setTimer(min: 1)
-        model.updateProgress(value: 1.0 / 60.0) // One second remaining.
+        model.updateProgress(value: 1.0 / 60.0)
         model.start()
 
         let countdownTask = Task { await model.runCountdown() }
@@ -50,7 +50,7 @@ final class TimerModelTests: XCTestCase {
     }
 
     func testUpdateProgressClampsInputRange() {
-        let model = TimerModel()
+        let model = TimerViewModel()
         model.setTimer(min: 1)
 
         model.updateProgress(value: -0.5)
@@ -61,41 +61,5 @@ final class TimerModelTests: XCTestCase {
 
         model.updateProgress(value: 0.5)
         XCTAssertEqual(model.count, 30)
-    }
-}
-
-final class ProgressArcMathTests: XCTestCase {
-    func testKnobPositionAtBounds() {
-        let arc = ProgressArc(progress: 0)
-        let center = CGPoint(x: 100, y: 100)
-        let radius: CGFloat = 50
-
-        let left = arc.knobPosition(p: 0, r: radius, c: center)
-        let right = arc.knobPosition(p: 1, r: radius, c: center)
-
-        XCTAssertEqual(left.x, center.x - radius, accuracy: 0.001)
-        XCTAssertEqual(left.y, center.y, accuracy: 0.001)
-        XCTAssertEqual(right.x, center.x + radius, accuracy: 0.001)
-        XCTAssertEqual(right.y, center.y, accuracy: 0.001)
-    }
-
-    func testProgressFromDragAtTopIsHalf() {
-        let arc = ProgressArc(progress: 0)
-        let center = CGPoint(x: 100, y: 100)
-        let top = CGPoint(x: 100, y: 0)
-
-        let progress = arc.progressFromDrag(loc: top, center: center)
-
-        XCTAssertEqual(progress, 0.5, accuracy: 0.001)
-    }
-
-    func testProgressFromDragProjectsLowerHalfTouchesToUpperArc() {
-        let arc = ProgressArc(progress: 0)
-        let center = CGPoint(x: 100, y: 100)
-        let belowCenter = CGPoint(x: 100, y: 160)
-
-        let progress = arc.progressFromDrag(loc: belowCenter, center: center)
-
-        XCTAssertEqual(progress, 0.5, accuracy: 0.001)
     }
 }

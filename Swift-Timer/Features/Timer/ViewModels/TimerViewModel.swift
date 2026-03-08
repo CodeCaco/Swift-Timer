@@ -1,14 +1,15 @@
 import Foundation
 
 @MainActor
-class TimerModel: ObservableObject {
+class TimerViewModel: ObservableObject {
     @Published private(set) var isActivated = false
     @Published private(set) var isRunning = false
     @Published private(set) var count = 0
+
     private var total = 0
     private let clock = ContinuousClock()
     private var endInstant: ContinuousClock.Instant? = nil
-    
+
     func setTimer(min: Int) {
         count = 60 * min
         total = count
@@ -16,7 +17,7 @@ class TimerModel: ObservableObject {
         isActivated = false
         endInstant = nil
     }
-    
+
     func runCountdown() async {
         guard isRunning else { return }
         while isRunning {
@@ -25,6 +26,7 @@ class TimerModel: ObservableObject {
             } catch {
                 return
             }
+
             guard isRunning else { break }
             if let endInstant {
                 count = remainingSeconds(until: endInstant)
@@ -36,21 +38,21 @@ class TimerModel: ObservableObject {
             }
         }
     }
-    
+
     func start() {
         guard count > 0 else { return }
         isActivated = true
         isRunning = true
         endInstant = clock.now.advanced(by: .seconds(count))
     }
-    
+
     func pause() {
         guard let endInstant else { return }
         count = remainingSeconds(until: endInstant)
         self.endInstant = nil
         isRunning = false
     }
-    
+
     func toggleRunning() {
         if isRunning {
             pause()
@@ -58,7 +60,7 @@ class TimerModel: ObservableObject {
             start()
         }
     }
-    
+
     func reset() {
         isRunning = false
         count = 0
@@ -66,18 +68,22 @@ class TimerModel: ObservableObject {
         isActivated = false
         endInstant = nil
     }
-    
+
     var formattedTime: String {
         let minutes = count / 60
         let seconds = count % 60
         return String(format: "%02d:%02d", minutes, seconds)
     }
-    
-    var progress: Double{
+
+    var timeInMinutes: Int {
+        count / 60
+    }
+
+    var progress: Double {
         guard total > 0 else { return 0 }
         return 1 - Double(total - count) / Double(total)
     }
-    
+
     func updateProgress(value: Double) {
         guard total > 0 else { return }
 
